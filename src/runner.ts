@@ -4,13 +4,12 @@ import { chromium, firefox } from 'playwright';
 import { buildMonitorResult } from './alerts.js';
 import { computeHistoryStats, loadHistory, openHistoryStore, saveHistory } from './history.js';
 import { loadHtmlSelector } from './htmlUtils.js';
-import { createEmptyProduct, isBotPage, isExtractionSuccessful, mergeDefinedPartial } from './parsers/enrichment.js';
+import { createEmptyProduct, isExtractionSuccessful, mergeDefinedPartial } from './parsers/enrichment.js';
 import { parseProduct } from './parsers/index.js';
 import {
     BESTBUY_USER_AGENT,
     bestBuyRetryDelayMs,
     getBestBuyLaunchOptions,
-    isBestBuyBlocked,
     loadBestBuyProduct,
 } from './platforms/bestBuyHelpers.js';
 import {
@@ -18,12 +17,12 @@ import {
     ebayStickyProxyOnRetry,
     getEbayLaunchOptions,
     ebayRetryDelayMs,
-    isEbayBlocked,
     resolveEbayBrowserMode,
     warmEbaySession,
 } from './platforms/ebayHelpers.js';
-import { isWalmartBlocked, getWalmartLaunchOptions, loadWalmartProduct, WALMART_USER_AGENT, walmartRetryDelayMs } from './platforms/walmartHelpers.js';
+import { getWalmartLaunchOptions, loadWalmartProduct, WALMART_USER_AGENT, walmartRetryDelayMs } from './platforms/walmartHelpers.js';
 import { attachTargetRedskyListener, applyTargetLocation, extractTargetDomPrice, extractTargetDomPriceUnavailableReason, fetchTargetRedsky, isTargetBlocked, type TargetLocationConfig } from './platforms/targetRedsky.js';
+import { isPlatformBlocked, maybeSolveCaptchaAndReload } from './captcha/runnerIntegration.js';
 import { discoverProductsFromSearches } from './search/runSearch.js';
 import type { ActorInput, AlertConfig, MonitorResult, Platform, ProductRequest, ProductSource } from './types.js';
 import { detectPlatform, normalizeUrl } from './utils.js';
@@ -181,6 +180,7 @@ interface EbayCrawlerOptions {
         headless: boolean;
         maxRequestRetries: number;
         targetLocation: TargetLocationConfig;
+        twoCaptchaApiKey?: string | null;
     };
     ebayProducts: ProductRequest[];
     maxConcurrency: number;
@@ -219,6 +219,7 @@ interface CrawlerRunContext {
     launcher: BrowserType;
     label: string;
     targetLocation: TargetLocationConfig;
+    twoCaptchaApiKey?: string | null;
     /** Keep the same proxy session on bot retries (Walmart sticky __sessid). */
     stickyProxyOnRetry?: boolean;
     /** Override default Chromium launch options (Walmart stealth). */
@@ -241,6 +242,7 @@ async function runProductCrawler(ctx: CrawlerRunContext): Promise<void> {
         launcher,
         label,
         targetLocation,
+        twoCaptchaApiKey,
         stickyProxyOnRetry = false,
         launchOptions,
         userAgent,
@@ -331,12 +333,16 @@ async function runProductCrawler(ctx: CrawlerRunContext): Promise<void> {
 
             const capturedRedsky = (await targetRedskyListener?.stop()) ?? {};
 
-            if (
-                isBotPage(html, pageTitle) ||
-                (platform === 'ebay' && isEbayBlocked(html, pageTitle)) ||
-                (platform === 'walmart' && isWalmartBlocked(html, pageTitle, pageUrl)) ||
-                (platform === 'bestbuy' && isBestBuyBlocked(html, pageTitle, pageUrl))
-            ) {
+            ({ html, pageTitle, pageUrl } = await maybeSolveCaptchaAndReload(
+                page,
+                platform,
+                normalizedUrl,
+                { html, pageTitle, pageUrl },
+                twoCaptchaApiKey,
+                reqLog,
+            ));
+
+            if (isPlatformBlocked(platform, html, pageTitle, pageUrl)) {
                 if (!stickyProxyOnRetry) session?.markBad();
                 const delay =
                     platform === 'ebay'
@@ -475,7 +481,14 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         maxRequestRetries = 4,
         targetZip,
         targetStoreId,
+        twoCaptchaApiKey,
     } = input;
+
+    const captchaApiKey =
+        twoCaptchaApiKey?.trim() ||
+        process.env.TWOCAPTCHA_API_KEY?.trim() ||
+        process.env.CAPTCHA_API_KEY?.trim() ||
+        null;
 
     if (!startUrls.length && !searches.length) {
         throw new Error('Provide at least one product URL in startUrls and/or a keyword search in searches.');
@@ -533,6 +546,7 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         headless,
         maxRequestRetries,
         targetLocation,
+        twoCaptchaApiKey: captchaApiKey,
     };
 
     if (ebayProducts.length) {

@@ -158,6 +158,7 @@ Optional env vars (see `.env.example`):
 
 - `EBAY_BROWSER` — `chromium` (default), `firefox`, or `auto`
 - `PROXY_HOST`, `PROXY_USERNAME`, `PROXY_PASSWORD`, `PROXY_COUNTRY=us`
+- `TWOCAPTCHA_API_KEY` (or `CAPTCHA_API_KEY`) — optional 2Captcha client key for bot/captcha pages
 
 ---
 
@@ -181,6 +182,43 @@ Uses Docker image `apify/actor-node-playwright:22` (Chromium + Firefox for optio
 - Use `.env.example` as a template with placeholder values only
 - No API keys or proxy passwords are stored in this repository
 - If you fork this project, rotate any credentials you accidentally exposed
+- Store **2Captcha** and **proxy** credentials in Apify **Secrets** or local `.env` only — never in git or public input fields when avoidable
+
+### 2Captcha (optional, production bot bypass)
+
+When retail sites serve **reCAPTCHA v2/v3**, **hCaptcha**, or **Cloudflare Turnstile**, the scraper can request a token from [2Captcha](https://2captcha.com) and inject it into the page before retrying extraction.
+
+**Local setup**
+
+```bash
+# .env (copy from .env.example)
+TWOCAPTCHA_API_KEY=your_2captcha_api_key
+```
+
+`CAPTCHA_API_KEY` is accepted as an alias. If the key is **not** set, behavior is unchanged — the Actor retries with proxy rotation as before.
+
+**Apify setup (recommended)**
+
+1. Apify Console → Actor → **Settings** → **Environment variables**
+2. Add secret `TWOCAPTCHA_API_KEY` with your 2Captcha client key
+3. Do **not** paste the key into public run input when secrets are available
+
+Optional Actor input field `twoCaptchaApiKey` exists for ad-hoc runs; prefer secrets for scheduled production jobs.
+
+**Supported captcha types**
+
+| Type | 2Captcha support | Notes |
+|------|------------------|-------|
+| reCAPTCHA v2 | ✅ | Sitekey + page URL |
+| reCAPTCHA v3 | ✅ | Sitekey, page URL, action |
+| hCaptcha | ✅ | Sitekey + page URL |
+| Cloudflare Turnstile | ✅ | When widget/sitekey is in DOM |
+| Amazon image captcha | ❌ | Not implemented (ImageToText) |
+| Amazon WAF | ❌ | Requires extra page params |
+| PerimeterX (Walmart hold button) | ❌ | Behavioral — use proxy + navigation strategies |
+| Akamai JS challenge (eBay/Best Buy) | ❌ | Cookie/session bypass, not token injection |
+
+Logs prefix `[2captcha]` when solving is attempted, skipped (no key), or falls back to proxy retry.
 
 ---
 
@@ -212,6 +250,7 @@ src/
   main.ts         Apify entry point
   localMain.ts    Local runner (.env + local.input.json)
   runner.ts       Playwright crawler orchestration
+  captcha/        2Captcha detection + solve integration
   parsers/        Platform HTML/JSON parsers
   search/         Keyword search builders
   platforms/      Platform-specific helpers

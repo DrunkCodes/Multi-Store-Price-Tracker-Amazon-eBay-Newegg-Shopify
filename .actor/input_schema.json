@@ -106,6 +106,13 @@
             "minimum": 0,
             "maximum": 10
         },
+        "twoCaptchaApiKey": {
+            "title": "2Captcha API Key (optional)",
+            "type": "string",
+            "description": "Optional 2Captcha API key for solving reCAPTCHA, hCaptcha, or Cloudflare Turnstile on bot pages. Prefer storing TWOCAPTCHA_API_KEY as an Apify secret environment variable instead of pasting here.",
+            "editor": "textfield",
+            "isSecret": true
+        },
         "proxyConfiguration": {
             "title": "Proxy Configuration",
             "type": "object",
