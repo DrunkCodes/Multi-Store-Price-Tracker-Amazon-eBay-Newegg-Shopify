@@ -1,0 +1,121 @@
+{
+    "title": "Amazon, eBay, Newegg & Shopify Price & Stock Monitor",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "startUrls": {
+            "title": "Product URLs",
+            "type": "array",
+            "description": "Direct product page URLs to monitor. Platform is auto-detected. Production-supported stores: Amazon, eBay, Newegg, and Shopify (/products/ URLs).",
+            "editor": "requestListSources",
+            "prefill": [
+                { "url": "https://www.amazon.com/dp/B004YAVF8I" },
+                { "url": "https://www.ebay.com/itm/146322838621" },
+                { "url": "https://www.newegg.com/samsung-990-pro-2tb/p/N82E16820147796" },
+                { "url": "https://www.gymshark.com/products/gymshark-crest-joggers-black-ss22" }
+            ]
+        },
+        "searches": {
+            "title": "Keyword Searches",
+            "type": "array",
+            "description": "Search by keyword on Amazon, eBay, or Newegg. Returns up to maxResults products per keyword, then scrapes full product details. Shopify requires direct product URLs.",
+            "editor": "json",
+            "prefill": [
+                {
+                    "keyword": "wireless mouse",
+                    "platform": "amazon",
+                    "maxResults": 5
+                }
+            ],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "keyword": {
+                        "title": "Keyword",
+                        "type": "string",
+                        "description": "Search term (e.g. wireless mouse, RTX 4070)"
+                    },
+                    "platform": {
+                        "title": "Platform",
+                        "type": "string",
+                        "description": "Store to search on (Amazon, eBay, or Newegg)",
+                        "enum": ["amazon", "ebay", "newegg"]
+                    },
+                    "maxResults": {
+                        "title": "Max Products per Keyword",
+                        "type": "integer",
+                        "description": "How many products to scrape from search results for this keyword",
+                        "default": 10,
+                        "minimum": 1,
+                        "maximum": 50
+                    }
+                },
+                "required": ["keyword", "platform"]
+            }
+        },
+        "trackHistory": {
+            "title": "Track Price History",
+            "type": "boolean",
+            "description": "Persist price history across runs in Key-Value Store for min/max/avg stats.",
+            "default": true
+        },
+        "alertOnPriceDrop": {
+            "title": "Alert on Price Drop",
+            "type": "boolean",
+            "description": "Trigger an alert when price drops by at least the threshold percentage.",
+            "default": true
+        },
+        "priceDropThresholdPercent": {
+            "title": "Price Drop Threshold (%)",
+            "type": "number",
+            "description": "Minimum price drop percentage to trigger an alert (0 = any drop).",
+            "default": 5,
+            "minimum": 0
+        },
+        "alertOnAnyPriceChange": {
+            "title": "Alert on Any Price Change",
+            "type": "boolean",
+            "description": "Trigger an alert on any price change, including increases.",
+            "default": false
+        },
+        "alertOnStockChange": {
+            "title": "Alert on Stock Changes",
+            "type": "boolean",
+            "description": "Trigger an alert when stock status changes (in stock ↔ out of stock).",
+            "default": true
+        },
+        "alertOnBackInStock": {
+            "title": "Alert When Back in Stock",
+            "type": "boolean",
+            "description": "Trigger an alert when a previously out-of-stock item becomes available.",
+            "default": true
+        },
+        "maxConcurrency": {
+            "title": "Max Concurrent Requests",
+            "type": "integer",
+            "description": "Maximum number of product pages scraped in parallel. Use 1–2 for large lists or heavy anti-bot sites.",
+            "default": 2,
+            "minimum": 1,
+            "maximum": 20
+        },
+        "maxRequestRetries": {
+            "title": "Max Request Retries",
+            "type": "integer",
+            "description": "Number of times to retry failed requests (rotates proxy on failure).",
+            "default": 4,
+            "minimum": 0,
+            "maximum": 10
+        },
+        "proxyConfiguration": {
+            "title": "Proxy Configuration",
+            "type": "object",
+            "description": "Apify Proxy settings. US residential proxy strongly recommended for Amazon and eBay.",
+            "editor": "proxy",
+            "default": {
+                "useApifyProxy": true,
+                "apifyProxyGroups": ["RESIDENTIAL"],
+                "apifyProxyCountry": "US"
+            }
+        }
+    }
+}

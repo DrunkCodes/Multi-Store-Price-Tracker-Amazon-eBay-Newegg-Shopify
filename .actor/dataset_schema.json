@@ -1,0 +1,107 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "platform",
+                    "title",
+                    "brand",
+                    "currentPrice",
+                    "originalPrice",
+                    "currency",
+                    "inStock",
+                    "rating",
+                    "reviewCount",
+                    "seller",
+                    "priceChanged",
+                    "priceChangePercent",
+                    "stockChanged",
+                    "alert",
+                    "alertReason",
+                    "scrapedAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "URL", "format": "link" },
+                    "platform": { "label": "Platform" },
+                    "title": { "label": "Product" },
+                    "brand": { "label": "Brand" },
+                    "currentPrice": { "label": "Price", "format": "number" },
+                    "originalPrice": { "label": "Was", "format": "number" },
+                    "currency": { "label": "Currency" },
+                    "inStock": { "label": "In Stock", "format": "boolean" },
+                    "rating": { "label": "Rating", "format": "number" },
+                    "reviewCount": { "label": "Reviews", "format": "number" },
+                    "seller": { "label": "Seller" },
+                    "priceChanged": { "label": "Price Changed", "format": "boolean" },
+                    "priceChangePercent": { "label": "Change %", "format": "number" },
+                    "stockChanged": { "label": "Stock Changed", "format": "boolean" },
+                    "alert": { "label": "Alert", "format": "boolean" },
+                    "alertReason": { "label": "Alert Reason" },
+                    "scrapedAt": { "label": "Scraped At", "format": "date" }
+                }
+            }
+        },
+        "details": {
+            "title": "Full Product Details",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "platform",
+                    "title",
+                    "brand",
+                    "currentPrice",
+                    "originalPrice",
+                    "discountPercent",
+                    "currency",
+                    "inStock",
+                    "availabilityText",
+                    "rating",
+                    "reviewCount",
+                    "seller",
+                    "imageUrl",
+                    "imageUrls",
+                    "searchKeyword",
+                    "source",
+                    "description",
+                    "highlights",
+                    "shippingInfo",
+                    "productId",
+                    "sku",
+                    "condition",
+                    "scrapedAt"
+                ]
+            },
+            "display": {
+                "component": "table"
+            }
+        },
+        "alerts": {
+            "title": "Alerts Only",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "title",
+                    "currentPrice",
+                    "previousPrice",
+                    "priceChangePercent",
+                    "inStock",
+                    "alertReason",
+                    "scrapedAt"
+                ],
+                "flatten": [],
+                "desc": true,
+                "limit": 1000
+            },
+            "display": {
+                "component": "table"
+            }
+        }
+    }
+}

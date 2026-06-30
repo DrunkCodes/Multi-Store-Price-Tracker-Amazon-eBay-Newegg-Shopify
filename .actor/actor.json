@@ -1,0 +1,15 @@
+{
+    "actorSpecification": 1,
+    "name": "price-stock-monitor-amazon-ebay-newegg-shopify",
+    "title": "Amazon, eBay, Newegg & Shopify Price & Stock Monitor",
+    "description": "Monitor product prices and stock on Amazon, eBay, Newegg, and Shopify stores. Track changes between scheduled runs, build price history, and trigger alerts on price drops or restocks. Playwright-powered scraping with US residential proxy support.",
+    "version": "1.0.0",
+    "meta": {
+        "templateId": "ts-crawlee-playwright"
+    },
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
+}

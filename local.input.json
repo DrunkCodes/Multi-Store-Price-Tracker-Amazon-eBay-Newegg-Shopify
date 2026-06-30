@@ -1,0 +1,16 @@
+{
+    "startUrls": [
+        { "url": "https://www.amazon.com/dp/B004YAVF8I" },
+        { "url": "https://www.ebay.com/itm/146322838621" },
+        { "url": "https://www.newegg.com/samsung-990-pro-2tb/p/N82E16820147796" },
+        { "url": "https://www.gymshark.com/products/gymshark-crest-joggers-black-ss22" }
+    ],
+    "trackHistory": true,
+    "alertOnPriceDrop": true,
+    "priceDropThresholdPercent": 5,
+    "maxConcurrency": 2,
+    "maxRequestRetries": 4,
+    "useProxy": true,
+    "headless": true,
+    "outputFile": "output/local_results.json"
+}

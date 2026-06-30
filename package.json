@@ -1,0 +1,30 @@
+{
+    "name": "price-stock-monitor-amazon-ebay-newegg-shopify",
+    "version": "1.0.0",
+    "description": "Monitor prices and stock on Amazon, eBay, Newegg, and Shopify with change detection, history, and alerts.",
+    "type": "module",
+    "main": "dist/main.js",
+    "scripts": {
+        "start": "npm run start:dev",
+        "start:dev": "node ./node_modules/tsx/dist/cli.mjs src/main.ts",
+        "start:local": "node ./node_modules/tsx/dist/cli.mjs src/localMain.ts",
+        "start:prod": "node dist/main.js",
+        "build": "node ./node_modules/typescript/lib/tsc.js",
+        "postinstall": "npx playwright install chromium firefox",
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    },
+    "dependencies": {
+        "apify": "^3.3.2",
+        "cheerio": "^1.0.0",
+        "crawlee": "^3.13.2",
+        "playwright": "^1.51.0"
+    },
+    "devDependencies": {
+        "@apify/tsconfig": "^0.1.1",
+        "@types/node": "^22.13.4",
+        "tsx": "^4.19.3",
+        "typescript": "^5.7.3"
+    },
+    "author": "DrunkCodes",
+    "license": "ISC"
+}

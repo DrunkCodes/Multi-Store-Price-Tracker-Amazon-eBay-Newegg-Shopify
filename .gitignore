@@ -1,0 +1,22 @@
+node_modules/
+dist/
+storage/
+storage-*/
+output/
+.apify/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+fixtures/
+tsconfig.tsbuildinfo
+
+# Local dev / test artifacts (never commit credentials or run output)
+local.*.input.json
+test_*.json
+*_test_results.json
+local_ebay_*.json
+*.html
+*_probe.txt
+*_snippets.txt
