@@ -1,10 +1,15 @@
 FROM apify/actor-node-playwright:22
 
-COPY package*.json ./
+# Apify base images run as myuser — files must not be root-owned (avoids EACCES on package-lock.json)
+COPY --chown=myuser:myuser package*.json ./
 
-RUN npm install --include=dev \
-    && npm run build
+RUN npm --quiet set progress=false \
+    && npm install --include=dev --no-audit \
+    && echo "Installed NPM packages:" \
+    && (npm list --include=dev || true)
 
-COPY . ./
+COPY --chown=myuser:myuser . ./
+
+RUN npm run build
 
 CMD npm run start:prod
