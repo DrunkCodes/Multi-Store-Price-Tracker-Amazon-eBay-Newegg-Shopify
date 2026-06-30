@@ -95,7 +95,6 @@
                     "alertReason",
                     "scrapedAt"
                 ],
-                "flatten": [],
                 "desc": true,
                 "limit": 1000
             },
