@@ -1,9 +1,217 @@
 {
     "actorSpecification": 1,
-    "fields": {},
+    "description": "One item per monitored product URL. Includes current price/stock, change detection, alert flags, and optional price history stats.",
+    "fields": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+            "url": {
+                "type": "string",
+                "title": "Product URL",
+                "description": "Direct link to the product page that was monitored.",
+                "example": "https://www.amazon.com/dp/B004YAVF8I"
+            },
+            "platform": {
+                "type": "string",
+                "title": "Store",
+                "description": "Detected e-commerce platform.",
+                "example": "amazon",
+                "enum": ["amazon", "ebay", "newegg", "shopify", "walmart", "target", "bestbuy", "generic"]
+            },
+            "source": {
+                "type": "string",
+                "title": "Source",
+                "description": "How this product was added — direct URL or keyword search.",
+                "example": "direct_url",
+                "enum": ["direct_url", "keyword_search"]
+            },
+            "searchKeyword": {
+                "type": ["string", "null"],
+                "title": "Search keyword",
+                "description": "Keyword used when this URL came from a search (null for direct URLs).",
+                "example": "wireless mouse"
+            },
+            "title": {
+                "type": ["string", "null"],
+                "title": "Product title",
+                "description": "Product name as shown on the store page.",
+                "example": "Logitech M510 Wireless Mouse"
+            },
+            "brand": {
+                "type": ["string", "null"],
+                "title": "Brand",
+                "example": "Logitech"
+            },
+            "currentPrice": {
+                "type": ["number", "null"],
+                "title": "Current price",
+                "description": "Latest scraped price in the store's currency.",
+                "example": 29.99
+            },
+            "originalPrice": {
+                "type": ["number", "null"],
+                "title": "Original / was price",
+                "description": "Strikethrough or list price when shown on the page.",
+                "example": 39.99
+            },
+            "discountPercent": {
+                "type": ["number", "null"],
+                "title": "Discount %",
+                "example": 25
+            },
+            "currency": {
+                "type": ["string", "null"],
+                "title": "Currency",
+                "example": "USD"
+            },
+            "inStock": {
+                "type": ["boolean", "null"],
+                "title": "In stock",
+                "description": "Whether the product appears available to buy.",
+                "example": true
+            },
+            "availabilityText": {
+                "type": ["string", "null"],
+                "title": "Availability text",
+                "example": "In Stock"
+            },
+            "priceChanged": {
+                "type": "boolean",
+                "title": "Price changed",
+                "description": "True when current price differs from the previous run.",
+                "example": true
+            },
+            "priceChangePercent": {
+                "type": ["number", "null"],
+                "title": "Price change %",
+                "description": "Percent change vs previous run (negative = drop).",
+                "example": -12.5
+            },
+            "stockChanged": {
+                "type": "boolean",
+                "title": "Stock changed",
+                "example": false
+            },
+            "previousPrice": {
+                "type": ["number", "null"],
+                "title": "Previous price",
+                "example": 34.99
+            },
+            "previousInStock": {
+                "type": ["boolean", "null"],
+                "title": "Previously in stock",
+                "example": true
+            },
+            "priceHistory": {
+                "type": ["object", "null"],
+                "title": "Price history stats",
+                "description": "Min, max, and average price across saved history (when enabled).",
+                "properties": {
+                    "min": { "type": ["number", "null"] },
+                    "max": { "type": ["number", "null"] },
+                    "avg": { "type": ["number", "null"] },
+                    "dataPoints": { "type": "integer" }
+                }
+            },
+            "alert": {
+                "type": "boolean",
+                "title": "Alert",
+                "description": "True when this row matched your alert rules (price drop, stock change, restock, etc.). Use for webhooks.",
+                "example": true
+            },
+            "alertReason": {
+                "type": ["string", "null"],
+                "title": "Alert reason",
+                "example": "Price dropped 8.2% (threshold 5%)"
+            },
+            "alertReasons": {
+                "type": "array",
+                "title": "Alert reasons",
+                "items": { "type": "string" }
+            },
+            "isFirstRun": {
+                "type": "boolean",
+                "title": "First run",
+                "description": "True on the first scrape of this URL — alerts usually start on the next run.",
+                "example": false
+            },
+            "rating": {
+                "type": ["number", "null"],
+                "title": "Rating",
+                "example": 4.7
+            },
+            "reviewCount": {
+                "type": ["integer", "null"],
+                "title": "Review count",
+                "example": 12543
+            },
+            "seller": {
+                "type": ["string", "null"],
+                "title": "Seller",
+                "example": "Amazon.com"
+            },
+            "imageUrl": {
+                "type": ["string", "null"],
+                "title": "Main image URL"
+            },
+            "imageUrls": {
+                "type": "array",
+                "title": "Image URLs",
+                "items": { "type": "string" }
+            },
+            "description": {
+                "type": ["string", "null"],
+                "title": "Description"
+            },
+            "category": {
+                "type": ["string", "null"],
+                "title": "Category"
+            },
+            "sku": {
+                "type": ["string", "null"],
+                "title": "SKU"
+            },
+            "productId": {
+                "type": ["string", "null"],
+                "title": "Product ID"
+            },
+            "condition": {
+                "type": ["string", "null"],
+                "title": "Condition",
+                "example": "New"
+            },
+            "shippingInfo": {
+                "type": ["string", "null"],
+                "title": "Shipping info"
+            },
+            "highlights": {
+                "type": "array",
+                "title": "Highlights",
+                "items": { "type": "string" }
+            },
+            "priceUnavailableReason": {
+                "type": ["string", "null"],
+                "title": "Price unavailable reason",
+                "enum": ["see_price_in_cart", "map_pricing", "out_of_stock", "price_not_returned", null]
+            },
+            "scrapedAt": {
+                "type": "string",
+                "title": "Scraped at",
+                "description": "ISO timestamp when this product was checked.",
+                "example": "2026-06-30T12:00:00.000Z"
+            },
+            "error": {
+                "type": "string",
+                "title": "Error",
+                "description": "Present when scraping this URL failed."
+            }
+        },
+        "required": ["url", "platform", "scrapedAt", "alert"]
+    },
     "views": {
         "overview": {
             "title": "Overview",
+            "description": "Key fields for daily monitoring — price, stock, and alerts at a glance.",
             "transformation": {
                 "fields": [
                     "url",
@@ -14,14 +222,12 @@
                     "originalPrice",
                     "currency",
                     "inStock",
-                    "rating",
-                    "reviewCount",
-                    "seller",
                     "priceChanged",
                     "priceChangePercent",
                     "stockChanged",
                     "alert",
                     "alertReason",
+                    "isFirstRun",
                     "scrapedAt"
                 ]
             },
@@ -29,31 +235,101 @@
                 "component": "table",
                 "properties": {
                     "url": { "label": "URL", "format": "link" },
-                    "platform": { "label": "Platform" },
+                    "platform": { "label": "Store" },
                     "title": { "label": "Product" },
                     "brand": { "label": "Brand" },
                     "currentPrice": { "label": "Price", "format": "number" },
                     "originalPrice": { "label": "Was", "format": "number" },
                     "currency": { "label": "Currency" },
                     "inStock": { "label": "In Stock", "format": "boolean" },
-                    "rating": { "label": "Rating", "format": "number" },
-                    "reviewCount": { "label": "Reviews", "format": "number" },
-                    "seller": { "label": "Seller" },
                     "priceChanged": { "label": "Price Changed", "format": "boolean" },
                     "priceChangePercent": { "label": "Change %", "format": "number" },
                     "stockChanged": { "label": "Stock Changed", "format": "boolean" },
                     "alert": { "label": "Alert", "format": "boolean" },
                     "alertReason": { "label": "Alert Reason" },
+                    "isFirstRun": { "label": "First Run", "format": "boolean" },
+                    "scrapedAt": { "label": "Scraped At", "format": "date" }
+                }
+            }
+        },
+        "alerts": {
+            "title": "Alerts & changes",
+            "description": "Price and stock change fields — filter for alert = true when sending webhooks.",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "platform",
+                    "title",
+                    "currentPrice",
+                    "previousPrice",
+                    "priceChangePercent",
+                    "inStock",
+                    "previousInStock",
+                    "priceChanged",
+                    "stockChanged",
+                    "alert",
+                    "alertReason",
+                    "scrapedAt"
+                ],
+                "desc": true,
+                "limit": 1000
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "URL", "format": "link" },
+                    "currentPrice": { "label": "Price", "format": "number" },
+                    "previousPrice": { "label": "Was", "format": "number" },
+                    "priceChangePercent": { "label": "Change %", "format": "number" },
+                    "inStock": { "label": "In Stock", "format": "boolean" },
+                    "alert": { "label": "Alert", "format": "boolean" },
+                    "alertReason": { "label": "Reason" },
+                    "scrapedAt": { "label": "Scraped At", "format": "date" }
+                }
+            }
+        },
+        "pricing": {
+            "title": "Pricing analysis",
+            "description": "Price-focused view with history stats for deal tracking and competitor analysis.",
+            "transformation": {
+                "fields": [
+                    "url",
+                    "platform",
+                    "title",
+                    "currentPrice",
+                    "originalPrice",
+                    "discountPercent",
+                    "currency",
+                    "priceHistory",
+                    "priceChanged",
+                    "priceChangePercent",
+                    "previousPrice",
+                    "alert",
+                    "scrapedAt"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "url": { "label": "URL", "format": "link" },
+                    "currentPrice": { "label": "Price", "format": "number" },
+                    "originalPrice": { "label": "Was", "format": "number" },
+                    "discountPercent": { "label": "Discount %", "format": "number" },
+                    "priceChangePercent": { "label": "Change %", "format": "number" },
+                    "alert": { "label": "Alert", "format": "boolean" },
                     "scrapedAt": { "label": "Scraped At", "format": "date" }
                 }
             }
         },
         "details": {
-            "title": "Full Product Details",
+            "title": "Full product details",
+            "description": "All scraped product metadata including images, seller, and descriptions.",
             "transformation": {
                 "fields": [
                     "url",
                     "platform",
+                    "source",
+                    "searchKeyword",
                     "title",
                     "brand",
                     "currentPrice",
@@ -67,39 +343,30 @@
                     "seller",
                     "imageUrl",
                     "imageUrls",
-                    "searchKeyword",
-                    "source",
                     "description",
                     "highlights",
                     "shippingInfo",
                     "productId",
                     "sku",
                     "condition",
+                    "priceUnavailableReason",
+                    "error",
                     "scrapedAt"
                 ]
             },
             "display": {
-                "component": "table"
-            }
-        },
-        "alerts": {
-            "title": "Alerts Only",
-            "transformation": {
-                "fields": [
-                    "url",
-                    "title",
-                    "currentPrice",
-                    "previousPrice",
-                    "priceChangePercent",
-                    "inStock",
-                    "alertReason",
-                    "scrapedAt"
-                ],
-                "desc": true,
-                "limit": 1000
-            },
-            "display": {
-                "component": "table"
+                "component": "table",
+                "properties": {
+                    "url": { "label": "URL", "format": "link" },
+                    "imageUrl": { "label": "Image", "format": "image" },
+                    "title": { "label": "Product" },
+                    "currentPrice": { "label": "Price", "format": "number" },
+                    "inStock": { "label": "In Stock", "format": "boolean" },
+                    "rating": { "label": "Rating", "format": "number" },
+                    "reviewCount": { "label": "Reviews", "format": "number" },
+                    "seller": { "label": "Seller" },
+                    "scrapedAt": { "label": "Scraped At", "format": "date" }
+                }
             }
         }
     }

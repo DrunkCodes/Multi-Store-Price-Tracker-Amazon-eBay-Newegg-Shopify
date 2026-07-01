@@ -3,15 +3,20 @@
     "name": "price-stock-monitor-amazon-ebay-newegg-shopify",
     "title": "Amazon, eBay, Newegg & Shopify Price & Stock Monitor",
     "description": "Track prices and stock on Amazon, eBay, Newegg, and Shopify. Get alerts on price drops and restocks, build price history, and export data to Slack, email, or Zapier.",
-    "version": "0.2",
+    "version": "0.3",
     "buildTag": "latest",
+    "usesStandbyMode": false,
     "meta": {
         "templateId": "ts-crawlee-playwright"
     },
     "readme": "../ACTOR.md",
     "input": "./input_schema.json",
+    "output": "./output_schema.json",
     "storages": {
-        "dataset": "./dataset_schema.json"
+        "dataset": "./dataset_schema.json",
+        "keyValueStores": {
+            "price-history": "./key_value_store_schema.json"
+        }
     },
     "dockerfile": "../Dockerfile",
     "defaultMemoryMbytes": 2048,

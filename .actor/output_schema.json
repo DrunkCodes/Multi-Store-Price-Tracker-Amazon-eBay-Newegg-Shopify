@@ -1,0 +1,37 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Price & stock monitor output",
+    "description": "Each run writes one dataset row per monitored product. When Save price history is enabled, rolling snapshots are also stored in the price-history key-value store for the next run.",
+    "properties": {
+        "products": {
+            "type": "string",
+            "title": "All products",
+            "description": "Full results table — current price, stock, change flags, and alert status for every monitored URL.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        },
+        "alerts": {
+            "type": "string",
+            "title": "Alerts & changes",
+            "description": "Focused view of price, stock, and alert fields. Filter rows where alert is true for webhook integrations.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=alerts"
+        },
+        "details": {
+            "type": "string",
+            "title": "Full product details",
+            "description": "Extended fields including images, description, seller, SKU, and search metadata.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=details"
+        },
+        "pricing": {
+            "type": "string",
+            "title": "Pricing analysis",
+            "description": "Price, discount, and history stats for deal tracking.",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=pricing"
+        },
+        "priceHistory": {
+            "type": "string",
+            "title": "Price history store",
+            "description": "Persistent JSON records (one per product URL) used to compare prices across scheduled runs. Only populated when Save price history is enabled.",
+            "template": "{{storages.keyValueStores.price-history.apiUrl}}/keys?collection=history"
+        }
+    }
+}

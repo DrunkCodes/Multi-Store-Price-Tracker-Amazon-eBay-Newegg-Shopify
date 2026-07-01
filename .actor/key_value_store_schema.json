@@ -1,0 +1,52 @@
+{
+    "actorKeyValueStoreSchemaVersion": 1,
+    "title": "Price history",
+    "description": "Rolling price snapshots per product URL. Persists between runs so the Actor can detect price drops and stock changes on the next scheduled run.",
+    "collections": {
+        "history": {
+            "title": "Product history",
+            "description": "One JSON record per monitored product (keys start with history_). Contains past prices and the last seen stock state.",
+            "keyPrefix": "history_",
+            "contentTypes": ["application/json"],
+            "jsonSchema": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "description": "Normalized product page URL."
+                    },
+                    "platform": {
+                        "type": "string",
+                        "description": "Store identifier (amazon, ebay, newegg, shopify, etc.)."
+                    },
+                    "title": {
+                        "type": ["string", "null"],
+                        "description": "Last known product title."
+                    },
+                    "prices": {
+                        "type": "array",
+                        "items": { "type": "number" },
+                        "description": "Observed prices over time (when Save price history is on)."
+                    },
+                    "lastPrice": {
+                        "type": ["number", "null"],
+                        "description": "Most recent price from the previous run."
+                    },
+                    "lastInStock": {
+                        "type": ["boolean", "null"],
+                        "description": "Most recent in-stock state from the previous run."
+                    },
+                    "lastScrapedAt": {
+                        "type": ["string", "null"],
+                        "description": "ISO timestamp of the last successful scrape."
+                    },
+                    "productId": {
+                        "type": ["string", "null"],
+                        "description": "Store-specific product identifier when available."
+                    }
+                },
+                "required": ["url", "platform", "prices"]
+            }
+        }
+    }
+}
