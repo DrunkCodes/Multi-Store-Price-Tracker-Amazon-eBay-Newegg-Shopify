@@ -56,7 +56,6 @@ Add **direct product links** or **search by keyword** on Amazon, eBay, and Neweg
 | **Price drop threshold (%)** | Minimum drop to trigger an alert | **5** = alert on 5%+ drop |
 | **Alert on stock change** | Notify when item goes in/out of stock | ✅ On |
 | **Alert when back in stock** | Notify when a sold-out item returns | ✅ On |
-| **Max concurrent requests** | Pages checked at the same time | **1–2** for long URL lists |
 | **Proxy** | Reduces blocks on major retailers | **US Residential** |
 
 ---
@@ -94,7 +93,7 @@ Use **webhooks** to send only alert rows to Slack, Discord, email, or your own a
 - Use **US residential proxy** for Amazon and eBay (default in input).  
 - Start with **5–10 URLs**, check results, then add more.  
 - **Schedule** the Actor — once or twice per day works well for most products.  
-- If a listing shows a captcha rarely, add a **2Captcha** key under Actor **Settings → Secrets** (optional, for advanced users only).
+- If a listing shows a captcha rarely, add **`TWOCAPTCHA_API_KEY`** under Actor **Settings → Secrets** (optional; not in Input).
 
 ---
 

@@ -8,8 +8,6 @@
     "trackHistory": true,
     "alertOnPriceDrop": true,
     "priceDropThresholdPercent": 5,
-    "maxConcurrency": 2,
-    "maxRequestRetries": 4,
     "useProxy": true,
     "headless": true,
     "outputFile": "output/local_results.json"

@@ -10,6 +10,8 @@ RUN npm --quiet set progress=false \
 
 COPY --chown=myuser:myuser . ./
 
+ENV NODE_OPTIONS="--max-old-space-size=1536"
+
 RUN npm run build
 
 CMD npm run start:prod

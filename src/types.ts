@@ -36,17 +36,10 @@ export interface ActorInput {
     alertOnAnyPriceChange?: boolean;
     alertOnStockChange?: boolean;
     alertOnBackInStock?: boolean;
-    maxConcurrency?: number;
-    maxRequestRetries?: number;
     /** Target.com store ZIP (e.g. 10001). Used for RedSky pricing/fulfillment and location cookies. */
     targetZip?: string;
     /** Target.com store ID (e.g. 1154). Overrides the store resolved from targetZip when set. */
     targetStoreId?: string;
-    /**
-     * Optional 2Captcha API key for solving reCAPTCHA/hCaptcha/Turnstile on bot pages.
-     * Prefer TWOCAPTCHA_API_KEY env / Apify secret in production — do not commit real keys.
-     */
-    twoCaptchaApiKey?: string;
     proxyConfiguration?: {
         useApifyProxy?: boolean;
         apifyProxyGroups?: string[];

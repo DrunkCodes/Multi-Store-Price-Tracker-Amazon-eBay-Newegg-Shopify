@@ -23,6 +23,14 @@ import {
 import { getWalmartLaunchOptions, loadWalmartProduct, WALMART_USER_AGENT, walmartRetryDelayMs } from './platforms/walmartHelpers.js';
 import { attachTargetRedskyListener, applyTargetLocation, extractTargetDomPrice, extractTargetDomPriceUnavailableReason, fetchTargetRedsky, isTargetBlocked, type TargetLocationConfig } from './platforms/targetRedsky.js';
 import { isPlatformBlocked, maybeSolveCaptchaAndReload } from './captcha/runnerIntegration.js';
+import {
+    resolveCaptchaApiKey,
+    SCRAPER_MAX_CONCURRENCY,
+    SCRAPER_MAX_REQUEST_RETRIES,
+    SCRAPER_NAVIGATION_TIMEOUT_MS,
+    SCRAPER_REQUEST_HANDLER_TIMEOUT_SECS,
+    SCRAPER_SESSION_POOL_MAX,
+} from './config.js';
 import { discoverProductsFromSearches } from './search/runSearch.js';
 import type { ActorInput, AlertConfig, MonitorResult, Platform, ProductRequest, ProductSource } from './types.js';
 import { detectPlatform, normalizeUrl } from './utils.js';
@@ -84,7 +92,7 @@ async function waitForProductContent(page: Page, platform: Platform): Promise<vo
             })
             .catch(() => undefined);
         await page.locator('[data-test="product-price"], [data-test="product-title"]').first().scrollIntoViewIfNeeded().catch(() => undefined);
-        await page.waitForTimeout(800);
+        await page.waitForTimeout(400);
         return;
     }
 
@@ -124,18 +132,28 @@ async function waitForProductContent(page: Page, platform: Platform): Promise<vo
 
     if (platform === 'newegg') {
         await page
-            .waitForSelector('.price-current, [itemprop="price"], h1.product-title', { timeout: 20_000 })
+            .waitForSelector('.price-current, [itemprop="price"], h1.product-title', { timeout: 15_000 })
             .catch(() => undefined);
         await page.locator('.price-current, h1.product-title').first().scrollIntoViewIfNeeded().catch(() => undefined);
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(300);
     }
 
     const selector = PLATFORM_WAIT_SELECTORS[platform] ?? PLATFORM_WAIT_SELECTORS.generic!;
     try {
-        await page.waitForSelector(selector, { timeout: 25_000 });
+        await page.waitForSelector(selector, { timeout: 18_000 });
     } catch {
-        await page.waitForTimeout(2_000);
+        await page.waitForTimeout(800);
     }
+}
+
+async function enableLightweightPage(page: Page): Promise<void> {
+    await page.route('**/*', (route) => {
+        const type = route.request().resourceType();
+        if (type === 'image' || type === 'font' || type === 'media') {
+            return route.abort().catch(() => route.continue());
+        }
+        return route.continue();
+    });
 }
 
 function buildFailedResult(
@@ -178,23 +196,20 @@ interface EbayCrawlerOptions {
         historyStore: Awaited<ReturnType<typeof openHistoryStore>>;
         proxyConfiguration?: ProxyConfiguration;
         headless: boolean;
-        maxRequestRetries: number;
         targetLocation: TargetLocationConfig;
         twoCaptchaApiKey?: string | null;
     };
     ebayProducts: ProductRequest[];
-    maxConcurrency: number;
     headless: boolean;
     launcher: BrowserType;
     label: string;
 }
 
-async function runEbayCrawler({ sharedCtx, ebayProducts, maxConcurrency, headless, launcher, label }: EbayCrawlerOptions): Promise<void> {
+async function runEbayCrawler({ sharedCtx, ebayProducts, headless, launcher, label }: EbayCrawlerOptions): Promise<void> {
     const isChromium = launcher.name() === 'chromium';
     await runProductCrawler({
         ...sharedCtx,
         products: ebayProducts,
-        maxConcurrency: Math.min(maxConcurrency, 2),
         launcher,
         label,
         stickyProxyOnRetry: ebayStickyProxyOnRetry(),
@@ -214,8 +229,6 @@ interface CrawlerRunContext {
     historyStore: Awaited<ReturnType<typeof openHistoryStore>>;
     proxyConfiguration?: ProxyConfiguration;
     headless: boolean;
-    maxConcurrency: number;
-    maxRequestRetries: number;
     launcher: BrowserType;
     label: string;
     targetLocation: TargetLocationConfig;
@@ -237,8 +250,6 @@ async function runProductCrawler(ctx: CrawlerRunContext): Promise<void> {
         historyStore,
         proxyConfiguration,
         headless,
-        maxConcurrency,
-        maxRequestRetries,
         launcher,
         label,
         targetLocation,
@@ -255,37 +266,35 @@ async function runProductCrawler(ctx: CrawlerRunContext): Promise<void> {
 
     const crawler = new PlaywrightCrawler({
         proxyConfiguration,
-        maxConcurrency,
-        maxRequestRetries,
-        requestHandlerTimeoutSecs: label.includes('Best Buy') ? 180 : 180,
-        sessionPoolOptions: { blockedStatusCodes: [], maxPoolSize: 20 },
+        maxConcurrency: SCRAPER_MAX_CONCURRENCY,
+        maxRequestRetries: SCRAPER_MAX_REQUEST_RETRIES,
+        requestHandlerTimeoutSecs: SCRAPER_REQUEST_HANDLER_TIMEOUT_SECS,
+        sessionPoolOptions: { blockedStatusCodes: [], maxPoolSize: SCRAPER_SESSION_POOL_MAX },
         launchContext: {
             launcher,
             launchOptions: launchOptions ?? {
                 headless,
-                args: ['--disable-blink-features=AutomationControlled'],
+                args: ['--disable-blink-features=AutomationControlled', '--disable-dev-shm-usage'],
             },
             useIncognitoPages: true,
             ...(userAgent ? { userAgent } : {}),
         },
         preNavigationHooks: [
             async ({ page, request }, gotoOptions) => {
-                page.setDefaultNavigationTimeout(45_000);
+                page.setDefaultNavigationTimeout(SCRAPER_NAVIGATION_TIMEOUT_MS);
+                await enableLightweightPage(page);
                 await page.setExtraHTTPHeaders({
                     'Accept-Language': 'en-US,en;q=0.9',
                     Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 });
+                gotoOptions.waitUntil = 'domcontentloaded';
+                gotoOptions.timeout = SCRAPER_NAVIGATION_TIMEOUT_MS;
                 request.userData.normalizedUrl = normalizeUrl(request.url);
 
                 const product = request.userData.product as ProductRequest | undefined;
                 if (product?.platform === 'target') {
                     request.userData.targetRedskyListener = attachTargetRedskyListener(page);
                     await applyTargetLocation(page, targetLocation);
-                }
-
-                if (product?.platform === 'bestbuy') {
-                    gotoOptions.waitUntil = 'domcontentloaded';
-                    gotoOptions.timeout = 60_000;
                 }
             },
         ],
@@ -477,18 +486,11 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         alertOnAnyPriceChange = false,
         alertOnStockChange = true,
         alertOnBackInStock = true,
-        maxConcurrency = 3,
-        maxRequestRetries = 4,
         targetZip,
         targetStoreId,
-        twoCaptchaApiKey,
     } = input;
 
-    const captchaApiKey =
-        twoCaptchaApiKey?.trim() ||
-        process.env.TWOCAPTCHA_API_KEY?.trim() ||
-        process.env.CAPTCHA_API_KEY?.trim() ||
-        null;
+    const captchaApiKey = resolveCaptchaApiKey();
 
     if (!startUrls.length && !searches.length) {
         throw new Error('Provide at least one product URL in startUrls and/or a keyword search in searches.');
@@ -544,7 +546,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         historyStore,
         proxyConfiguration,
         headless,
-        maxRequestRetries,
         targetLocation,
         twoCaptchaApiKey: captchaApiKey,
     };
@@ -558,7 +559,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
             await runEbayCrawler({
                 sharedCtx,
                 ebayProducts,
-                maxConcurrency,
                 headless,
                 launcher: firefox,
                 label: 'eBay (Firefox)',
@@ -571,7 +571,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
             await runEbayCrawler({
                 sharedCtx,
                 ebayProducts,
-                maxConcurrency,
                 headless,
                 launcher: chromium,
                 label: 'eBay (Chromium)',
@@ -585,7 +584,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
                     await runEbayCrawler({
                         sharedCtx,
                         ebayProducts: retryProducts,
-                        maxConcurrency,
                         headless,
                         launcher: firefox,
                         label: 'eBay (Firefox fallback)',
@@ -600,7 +598,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         await runProductCrawler({
             ...sharedCtx,
             products: walmartProducts,
-            maxConcurrency: 1,
             launcher: chromium,
             label: 'Walmart',
             stickyProxyOnRetry: true,
@@ -614,7 +611,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         await runProductCrawler({
             ...sharedCtx,
             products: bestbuyProducts,
-            maxConcurrency: 1,
             launcher: chromium,
             label: 'Best Buy',
             stickyProxyOnRetry: true,
@@ -628,7 +624,6 @@ export async function runMonitor({ input, proxyConfiguration, headless = true }:
         await runProductCrawler({
             ...sharedCtx,
             products: otherProducts,
-            maxConcurrency,
             launcher: chromium,
             label: 'non-eBay',
         });

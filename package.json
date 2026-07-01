@@ -10,7 +10,7 @@
         "start:local": "node ./node_modules/tsx/dist/cli.mjs src/localMain.ts",
         "start:prod": "node dist/main.js",
         "build": "node ./node_modules/typescript/lib/tsc.js",
-        "postinstall": "npx playwright install chromium firefox",
+        "postinstall": "npx playwright install chromium",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
     },
     "dependencies": {

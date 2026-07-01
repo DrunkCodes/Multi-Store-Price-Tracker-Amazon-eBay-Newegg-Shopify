@@ -90,29 +90,6 @@
             "description": "Trigger an alert when a previously out-of-stock item becomes available.",
             "default": true
         },
-        "maxConcurrency": {
-            "title": "Max Concurrent Requests",
-            "type": "integer",
-            "description": "Maximum number of product pages scraped in parallel. Use 1–2 for large lists or heavy anti-bot sites.",
-            "default": 2,
-            "minimum": 1,
-            "maximum": 20
-        },
-        "maxRequestRetries": {
-            "title": "Max Request Retries",
-            "type": "integer",
-            "description": "Number of times to retry failed requests (rotates proxy on failure).",
-            "default": 4,
-            "minimum": 0,
-            "maximum": 10
-        },
-        "twoCaptchaApiKey": {
-            "title": "2Captcha API Key (optional)",
-            "type": "string",
-            "description": "Optional 2Captcha API key for solving reCAPTCHA, hCaptcha, or Cloudflare Turnstile on bot pages. Prefer storing TWOCAPTCHA_API_KEY as an Apify secret environment variable instead of pasting here.",
-            "editor": "textfield",
-            "isSecret": true
-        },
         "proxyConfiguration": {
             "title": "Proxy Configuration",
             "type": "object",
