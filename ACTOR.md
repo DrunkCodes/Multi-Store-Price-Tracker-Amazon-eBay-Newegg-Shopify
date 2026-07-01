@@ -79,7 +79,22 @@ For Shopify, paste the product link from any store (`/products/…` in the URL).
 | **Alert when back in stock** | Leave on if you want restock notifications |
 | **Proxy settings** | Use US Residential (default) |
 
-**Recommended run settings:** **2 GB memory**, **15 min timeout** (set automatically for new runs).
+**Recommended run settings:** memory depends on how many products you monitor (see below). **2 GB** is the safe default in Console; smaller jobs can use **1 GB** to save cost.
+
+### Memory & cost (dynamic sizing)
+
+This Actor scales with how many product pages it opens:
+
+| Products to check (URLs + search results) | Recommended memory | Typical timeout |
+|-------------------------------------------|-------------------|-----------------|
+| 1–5 | **1024 MB** (1 GB) | 10 min |
+| 6–25 | **2048 MB** (2 GB) | 15 min |
+| 26–50 | **2048 MB** (2 GB) | 15 min |
+| 50+ | **4096 MB** (4 GB) | 20 min |
+
+**Console:** use **Run options → Memory** and pick the tier for your input. The run log warns if memory looks too low or suggests **1 GB** when you can save ~50% compute cost.
+
+**API / schedules:** use `npm run start-apify-run -- your-input.json` (sets memory and timeout automatically from input size).
 
 ---
 

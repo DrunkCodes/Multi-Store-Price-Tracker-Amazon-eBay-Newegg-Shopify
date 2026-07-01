@@ -12,7 +12,8 @@
         "build": "node ./node_modules/typescript/lib/tsc.js",
         "postinstall": "npx playwright install chromium",
         "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-        "sync-apify-defaults": "node scripts/sync-apify-run-defaults.mjs"
+        "sync-apify-defaults": "node scripts/sync-apify-run-defaults.mjs",
+        "start-apify-run": "node scripts/start-apify-run.mjs"
     },
     "dependencies": {
         "apify": "^3.3.2",

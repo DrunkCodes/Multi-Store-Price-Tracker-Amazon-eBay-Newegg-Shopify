@@ -33,6 +33,27 @@ npm run build
 npm run start:prod     # production entry (dist/main.js)
 ```
 
+On Apify, the container starts via `scripts/apify-entrypoint.mjs`, which sets Node heap from `APIFY_MEMORY_MBYTES` (~62% of container RAM; Chromium uses the rest).
+
+### Memory tiers
+
+Logic lives in `src/memoryTier.ts`:
+
+| Estimated product pages | Recommended memory |
+|-------------------------|-------------------|
+| 1–5 | 1024 MB |
+| 6–50 | 2048 MB |
+| 50+ | 4096 MB |
+
+Start a cloud run with auto-sized memory/timeout:
+
+```bash
+npm run build
+APIFY_TOKEN=... npm run start-apify-run -- local.input.json
+```
+
+At runtime, `main.ts` logs warnings if allocated memory is below the recommendation, or a cost tip when 1 GB would suffice.
+
 Apify builds from GitHub using the root `Dockerfile` (`apify/actor-node-playwright:22`).  
 Push to `main` → GitHub Actions deploys to Apify. Store readme is loaded from `ACTOR.md` via the `readme` field in `.actor/actor.json`.
 
@@ -53,6 +74,7 @@ On Apify, set secrets in Console → Actor → Settings → Environment variable
 .actor/              Actor config, input/dataset schemas
 src/
   main.ts            Apify entry point
+  memoryTier.ts      Input-based memory/timeout recommendations
   localMain.ts       Local runner
   runner.ts          Playwright + Crawlee orchestration
   captcha/           2Captcha detection and injection
