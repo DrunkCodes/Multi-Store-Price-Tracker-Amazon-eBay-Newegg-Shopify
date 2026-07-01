@@ -66,34 +66,47 @@ For Shopify, paste the product link from any store (`/products/…` in the URL).
 | **Alert when back in stock** | Leave on if you want restock notifications |
 | **Proxy settings** | Use US Residential (default) |
 
-**Recommended run settings:** **2 GB memory**, **15 min timeout** (default for this Actor).
+**Recommended run settings:** **2 GB memory**, **15 min timeout** (set automatically for new runs).
 
 ---
 
 ## Example workflows
 
-**Catch a deal on Amazon** — Add the `/dp/…` URL → set 5% drop threshold → schedule daily.
+**Catch a deal on Amazon**  
+Add the `/dp/…` URL → set 5% drop threshold → schedule once per day.
 
-**Track a competitor on eBay** — Add listing URLs → enable “Alert on any price change”.
+**Track a competitor on eBay**  
+Add their listing URLs → enable “Alert on any price change”.
 
-**Monitor PC parts on Newegg** — Search “Samsung SSD” or paste part URLs.
+**Monitor PC parts on Newegg**  
+Search “Samsung SSD” or paste part URLs directly.
 
-**Watch a Shopify brand** — Add `/products/…` links from that store.
+**Watch a Shopify brand**  
+Add that store’s `/products/…` links.
 
 ---
 
 ## FAQ
 
-**Why no alert the first time?** Nothing to compare yet — run at least twice.
+**Why no alert the first time?**  
+Nothing to compare yet. Run it at least twice.
 
-**Do I need my own proxies?** No — use Apify Proxy (US Residential) in Input.
+**Do I need my own proxies?**  
+No — enable Apify Proxy (US Residential) in Input.
 
-**Can I monitor any Shopify store?** Yes, with a public product URL.
+**Can I monitor any Shopify store?**  
+Yes, with a public product URL.
 
 ---
 
-## Open source
+## Tips
 
-[GitHub repository](https://github.com/DrunkCodes/Multi-Store-Price-Tracker-Amazon-eBay-Newegg-Shopify) — developers see [DEVELOPMENT.md](DEVELOPMENT.md).
+- Start with **5–10 products**, then scale up.  
+- **Schedule** daily or twice daily for best results.  
+- Filter your dataset for **alert = true** to see only changes that matter.  
+
+---
+
+Questions? Visit our [GitHub repo](https://github.com/DrunkCodes/Multi-Store-Price-Tracker-Amazon-eBay-Newegg-Shopify).
 
 Use responsibly and follow each store’s terms of service.

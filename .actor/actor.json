@@ -2,17 +2,22 @@
     "actorSpecification": 1,
     "name": "price-stock-monitor-amazon-ebay-newegg-shopify",
     "title": "Amazon, eBay, Newegg & Shopify Price & Stock Monitor",
-    "description": "Track prices and stock on Amazon, eBay, Newegg, and Shopify. Get alerts on price drops and restocks, build price history, and export data to Slack, email, or Zapier. Schedule daily monitoring in one click.",
-    "version": "1.0.1",
+    "description": "Track prices and stock on Amazon, eBay, Newegg, and Shopify. Get alerts on price drops and restocks, build price history, and export data to Slack, email, or Zapier.",
+    "version": "1.0.2",
     "meta": {
         "templateId": "ts-crawlee-playwright"
     },
+    "readme": "./ACTOR.md",
     "input": "./input_schema.json",
     "storages": {
         "dataset": "./dataset_schema.json"
     },
     "dockerfile": "../Dockerfile",
+    "defaultMemoryMbytes": 2048,
+    "minMemoryMbytes": 1024,
+    "maxMemoryMbytes": 4096,
     "defaultRunOptions": {
+        "build": "latest",
         "memoryMbytes": 2048,
         "timeoutSecs": 900
     }

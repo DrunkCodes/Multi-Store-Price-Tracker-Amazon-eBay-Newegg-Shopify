@@ -4,9 +4,11 @@
     "schemaVersion": 1,
     "properties": {
         "startUrls": {
-            "title": "Product URLs",
+            "title": "Product page URLs",
             "type": "array",
-            "description": "Direct product page URLs to monitor. Platform is auto-detected. Production-supported stores: Amazon, eBay, Newegg, and Shopify (/products/ URLs).",
+            "description": "Paste links to the exact product pages you want to watch. We auto-detect Amazon, eBay, Newegg, and Shopify. For Shopify, use a URL that contains /products/.",
+            "sectionCaption": "📦 What to monitor",
+            "sectionDescription": "Add direct product links and/or keyword searches below. You need at least one of these two sections filled in.",
             "editor": "requestListSources",
             "prefill": [
                 { "url": "https://www.amazon.com/dp/B004YAVF8I" },
@@ -16,10 +18,10 @@
             ]
         },
         "searches": {
-            "title": "Keyword Searches",
+            "title": "Keyword searches (optional)",
             "type": "array",
-            "description": "Search by keyword on Amazon, eBay, or Newegg. Returns up to maxResults products per keyword, then scrapes full product details. Shopify requires direct product URLs.",
-            "editor": "json",
+            "description": "Instead of pasting URLs, search Amazon, eBay, or Newegg by keyword and track the top matching products. Leave empty if you only use product URLs above.",
+            "editor": "schemaBased",
             "prefill": [
                 {
                     "keyword": "wireless mouse",
@@ -29,22 +31,30 @@
             ],
             "items": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "keyword": {
-                        "title": "Keyword",
+                        "title": "Search keyword",
                         "type": "string",
-                        "description": "Search term (e.g. wireless mouse, RTX 4070)"
+                        "description": "What to search for, e.g. wireless mouse, RTX 4070, airpods pro.",
+                        "editor": "textfield",
+                        "minLength": 1,
+                        "prefill": "wireless mouse"
                     },
                     "platform": {
-                        "title": "Platform",
+                        "title": "Store",
                         "type": "string",
-                        "description": "Store to search on (Amazon, eBay, or Newegg)",
-                        "enum": ["amazon", "ebay", "newegg"]
+                        "description": "Which store to run the search on. Shopify is not supported for keyword search — use product URLs instead.",
+                        "editor": "select",
+                        "enum": ["amazon", "ebay", "newegg"],
+                        "enumTitles": ["Amazon", "eBay", "Newegg"],
+                        "default": "amazon"
                     },
                     "maxResults": {
-                        "title": "Max Products per Keyword",
+                        "title": "Max products to track",
                         "type": "integer",
-                        "description": "How many products to scrape from search results for this keyword",
+                        "description": "How many products from the search results to open and monitor (1–50).",
+                        "editor": "number",
                         "default": 10,
                         "minimum": 1,
                         "maximum": 50
@@ -54,46 +64,56 @@
             }
         },
         "trackHistory": {
-            "title": "Track Price History",
+            "title": "Save price history",
             "type": "boolean",
-            "description": "Persist price history across runs in Key-Value Store for min/max/avg stats.",
-            "default": true
+            "description": "Keep a running history of each product’s price so you can see lowest, highest, and average over time.",
+            "sectionCaption": "🔔 Alerts & history",
+            "sectionDescription": "Control when you get notified about price drops, stock changes, and restocks.",
+            "default": true,
+            "editor": "checkbox"
         },
         "alertOnPriceDrop": {
-            "title": "Alert on Price Drop",
+            "title": "Alert when price drops",
             "type": "boolean",
-            "description": "Trigger an alert when price drops by at least the threshold percentage.",
-            "default": true
+            "description": "Mark a product as an alert when the price falls by at least the threshold below.",
+            "default": true,
+            "editor": "checkbox"
         },
         "priceDropThresholdPercent": {
-            "title": "Price Drop Threshold (%)",
+            "title": "Minimum price drop to alert (%)",
             "type": "number",
-            "description": "Minimum price drop percentage to trigger an alert (0 = any drop).",
+            "description": "Example: 5 means you only get a price-drop alert if the price falls by 5% or more. Use 0 to alert on any decrease.",
             "default": 5,
-            "minimum": 0
+            "minimum": 0,
+            "editor": "number"
         },
         "alertOnAnyPriceChange": {
-            "title": "Alert on Any Price Change",
+            "title": "Alert on any price change",
             "type": "boolean",
-            "description": "Trigger an alert on any price change, including increases.",
-            "default": false
+            "description": "Also alert when the price goes up, not just down. Useful for competitor tracking.",
+            "default": false,
+            "editor": "checkbox"
         },
         "alertOnStockChange": {
-            "title": "Alert on Stock Changes",
+            "title": "Alert when stock status changes",
             "type": "boolean",
-            "description": "Trigger an alert when stock status changes (in stock ↔ out of stock).",
-            "default": true
+            "description": "Get notified when an item goes from in stock to out of stock, or the other way around.",
+            "default": true,
+            "editor": "checkbox"
         },
         "alertOnBackInStock": {
-            "title": "Alert When Back in Stock",
+            "title": "Alert when back in stock",
             "type": "boolean",
-            "description": "Trigger an alert when a previously out-of-stock item becomes available.",
-            "default": true
+            "description": "Get a dedicated alert when a product that was out of stock becomes available again.",
+            "default": true,
+            "editor": "checkbox"
         },
         "proxyConfiguration": {
-            "title": "Proxy Configuration",
+            "title": "Proxy settings",
             "type": "object",
-            "description": "Apify Proxy settings. US residential proxy strongly recommended for Amazon and eBay.",
+            "description": "Use Apify Proxy with US Residential for best results on Amazon and eBay. Leave the default unless you know you need something else.",
+            "sectionCaption": "🌐 Connection (recommended)",
+            "sectionDescription": "Residential US proxy helps avoid blocks on Amazon and eBay.",
             "editor": "proxy",
             "default": {
                 "useApifyProxy": true,
