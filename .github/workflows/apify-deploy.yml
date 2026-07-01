@@ -17,7 +17,7 @@ jobs:
               uses: apify/push-actor-action@v1
               with:
                   token: ${{ secrets.APIFY_TOKEN }}
-                  version: '0.0'
+                  version: '0.1'
                   build-tag: latest
 
             - name: Sync default run options (memory & timeout)

@@ -26,7 +26,20 @@ Every run checks each product and returns:
 - **Price history** (low / high / average) over time  
 - Title, seller, ratings, reviews, and images when available  
 
-Send alert rows to **Slack**, **email**, **Google Sheets**, or **Zapier** using Apify webhooks.
+Rows with **alert = true** are the ones worth acting on — price drops, restocks, or stock changes you configured.
+
+---
+
+## Alerts & webhooks
+
+When a run finds a meaningful change, the product row gets **alert = true**. Use that to notify yourself or pipe data elsewhere:
+
+1. Open your Actor → **Integrations** → **Add webhook**.  
+2. Trigger on **Actor run succeeded**.  
+3. In the payload filter or downstream step, keep only dataset items where **alert** is true.  
+4. Send to **Slack**, **email**, **Google Sheets**, **Zapier**, or any HTTP endpoint.
+
+**Tip:** Schedule daily runs so alerts compare today’s prices against yesterday’s baseline.
 
 ---
 

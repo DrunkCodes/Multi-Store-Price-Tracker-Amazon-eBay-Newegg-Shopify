@@ -1,7 +1,7 @@
 # Development guide
 
 Technical documentation for contributors and local testing.  
-The [README.md](README.md) is written for Apify Store users; this file is for developers.
+End-user docs for the Apify Store live in [ACTOR.md](ACTOR.md) (referenced by `.actor/actor.json`). [README.md](README.md) mirrors that content for GitHub.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ npm run start:prod     # production entry (dist/main.js)
 ```
 
 Apify builds from GitHub using the root `Dockerfile` (`apify/actor-node-playwright:22`).  
-Push to `main` → Apify rebuilds. Actor docs are extracted from `README.md`.
+Push to `main` → GitHub Actions deploys to Apify. Store readme is loaded from `ACTOR.md` via the `readme` field in `.actor/actor.json`.
 
 ## Environment variables (`.env`)
 
