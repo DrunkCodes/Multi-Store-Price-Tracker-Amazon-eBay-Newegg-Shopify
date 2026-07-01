@@ -11,7 +11,8 @@
         "start:prod": "node dist/main.js",
         "build": "node ./node_modules/typescript/lib/tsc.js",
         "postinstall": "npx playwright install chromium",
-        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+        "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+        "sync-apify-defaults": "node scripts/sync-apify-run-defaults.mjs"
     },
     "dependencies": {
         "apify": "^3.3.2",

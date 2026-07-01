@@ -1,0 +1,31 @@
+name: Deploy Actor to Apify
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Push Actor to Apify
+              id: push
+              uses: apify/push-actor-action@v1
+              with:
+                  token: ${{ secrets.APIFY_TOKEN }}
+                  version: '0.0'
+                  build-tag: latest
+
+            - name: Sync default run options (memory & timeout)
+              env:
+                  APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+                  APIFY_USERNAME: DrunkCodes
+              run: node scripts/sync-apify-run-defaults.mjs
+
+            - name: Print build details
+              run: |
+                  echo "Build ${{ steps.push.outputs.build-id }} finished with status ${{ steps.push.outputs.build-status }}"
